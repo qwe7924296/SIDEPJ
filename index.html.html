@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-YMWDE0VTD3");
+  </script>
+
+
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#000" />
+
+  <title>Share Fun-Designer | Portfolio</title>
+  <link rel="icon" type="image/x-icon" href="src/png/main-favicon.png" />
+  <!-- aos cdn -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <!-- stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+  <!-- google fonts-->
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Passions+Conflict&family=Orbitron&family=Fira+Code&family=Six+Caps" />
+  <!-- AXIOS -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.prod.min.js"></script>
+
+  <style>
+
+
+    .bubble-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      padding: 40px;
+      max-width: 1600px;
+      margin: 0 auto;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    /* 加入更細緻的響應式斷點 */
+  @media (max-width: 1400px) {
+    .bubble-container {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      padding: 30px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .bubble-container {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 25px;
+      padding: 25px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .bubble-container {
+      grid-template-columns: repeat(1, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+  }
+  /* 為了避免在小螢幕上破版，添加響應式設計 */
+  @media (max-width: 1200px) {
+    .bubble-container {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 30px;
+      padding: 30px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .bubble-container {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+  }
+  .memory-bubble {
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto; /* 讓氣泡在容器中置中 */
+  position: relative;
+  transform-style: preserve-3d;
+  animation: float 8s ease-in-out infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+@media (max-width: 480px) {
+  .memory-bubble {
+    max-width: 280px;
+  }
+}
+    .bubble {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(5px);
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.5),
+        inset 20px 0 100px rgba(255, 192, 203, 0.5),
+        inset -20px 0 100px rgba(0, 255, 255, 0.5),
+        0 0 60px rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      will-change: transform, box-shadow;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .video-container {
+      width: 85%;
+      height: 85%;
+      position: relative;
+      transform-style: preserve-3d;
+      transform: translateZ(20px) rotate(-5deg);
+      border-radius: 50%;
+      overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      margin: auto;
+      will-change: transform;
+      backface-visibility: hidden;
+      z-index: 2;
+    }
+
+    .video-thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateZ(1px);
+      border-radius: 50%;
+      will-change: opacity;
+    }
+
+    .bubble video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: absolute;
+      top: 0;
+      left: 0;
+      will-change: opacity;
+    }
+
+    /* .bubble-title {
+      position: absolute;
+      bottom: -40px;
+      color: white;
+      font-size: 1.25rem;
+      text-align: center;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      will-change: transform, opacity;
+    } */
+
+
+    .memory-bubble .tooltip {
+  position: absolute;
+  bottom: 120%; /* 調整到更上方的位置 */
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  margin-bottom: 15px;
+  z-index: 9999; /* 確保最高層級 */
+}
+
+    /* Hover 效果 */
+    .memory-bubble:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateZ(50px); /* 確保tooltip在3D空間中的位置 */
+    }
+
+    /* 添加小箭頭 */
+    .memory-bubble .tooltip:after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: rgba(0, 0, 0, 0.7);
+      }
+
+    /* 確保氣泡本身的 z-index 較低 */
+    .bubble {
+      position: relative; 
+      z-index: 1;
+      transform-style: flat; /* 改為flat以避免3D層級問題 */
+    }
+
+    .memory-bubble:hover .bubble {
+      transform: translateZ(40px) scale(1.05);
+    }
+
+    .memory-bubble:hover .video-container {
+      transform: translateZ(50px) rotate(-8deg) scale(1.05);
+    }
+
+    .memory-bubble:hover .bubble-title {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .memory-bubble.playing .video-thumbnail {
+      opacity: 0;
+    }
+
+    .memory-bubble.playing .bubble video {
+      opacity: 1;
+    }
+
+    @keyframes float {
+      0%,
+      100% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+      }
+      50% {
+        transform: translate3d(0, -15px, 0) rotate(2deg);
+      }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .modal-content {
+      position: relative;
+      width: 90%;
+      max-width: 800px; /* 可根据需要调整 */
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 25px;
+      opacity: 0;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: scale(0.95) translateY(20px);
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2),
+        0 5px 15px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-content::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0.03) 100%
+      );
+      border-radius: 24px;
+      pointer-events: none;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-overlay.active .modal-content {
+      opacity: 1;
+      transform: scale(2) translateY(0);
+    }
+
+    /* 確保視頻容器比例 */
+    .modal-video-container {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transform: translateZ(0);
+    }
+
+    .modal-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 16px;
+    }
+
+    .modal-title {
+      color: white;
+      font-size: 1.8rem;
+      text-align: center;
+      margin-top: 20px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      transform: translateZ(0);
+    }
+
+    .close-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateZ(0) scale(1.1);
+    }
+
+    .close-button:active {
+      transform: translateZ(0) scale(0.95);
+    }
+
+    /* 自訂滾動條樣式 */
+    /* 修改滾動條樣式，使其更加緊湊 */
+    .modal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+      margin: 4px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      transition: background 0.3s ease;
+    }
+
+    /* 響應式優化 */
+    @media (max-width: 768px) {
+      .modal-content {
+        width: 95%;
+        padding: 15px;
+        max-height: 85vh; /* 移動設備稍微降低高度 */
+      }
+
+      .modal-video-container {
+        border-radius: 12px;
+      }
+
+      .close-button {
+        right: 10px;
+        top: 10px;
+      }
+    }
+
+    /* 防止背景滾動的樣式 */
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    @media (max-height: 600px) {
+      .modal-content {
+        max-height: 95vh;
+      }
+    }
+  </style>
+
+<body class="body">
+  <audio loop="" id="audioPlayer" style="display: none">
+    <source src="src/mp3/preloader.mp3" type="audio/mp3" />
+  </audio>
+  <div id="preloader"></div>
+  <noscript>Allow Javascript</noscript>
+
+  <header>
+    <div class="cursor-inner" id="cursor-inner"></div>
+    <div class="cursor-outer" id="cursor-outer"></div>
+
+    <div class="navbar" id="navbar">
+      <!-- <div class="hey">Hey!</div> -->
+      <div class="logo" tabindex="0" aria-label="vinod jangid logo">
+        <!-- 個人AI樣子 -->
+        <div class="logo-top">
+          <!-- <img src="src/png/ShareFunDesigner.png" alt="animation-head" id="nav-avatar"/> -->
+        </div>
+      </div>
+      <div class="navbar-tabs" id="navbar-tabs">
+        <ul class="navbar-tabs-ul">
+          <li class="home activeThistab" class="navbar-tabs-li" data-aos="fade-down" data-aos-delay="100">
+            <a href="#home" tabindex="0" aria-label="Home menu button">
+              &#60;/Home&#62;
+            </a>
+          </li>
+
+          <li class="about" class="navbar-tabs-li" data-aos="fade-down" data-aos-delay="300">
+            <a href="#about" aria-label="about menu button">
+              &#60;/AboutMe&#62;
+            </a>
+          </li>
+
+          <li class="skills" class="navbar-tabs-li" data-aos="fade-down" data-aos-delay="500">
+            <a href="#skills" aria-label="skills menu button">
+              &#60;/Skills&#62;
+            </a>
+          </li>
+
+          <li class="projects" class="navbar-tabs-li" data-aos="fade-down" data-aos-delay="700">
+            <a href="#projects" aria-label="projects menu button">
+              &#60;/Projects&#62;
+            </a>
+          </li>
+        </ul>
+      </div>
+      <!-- navbar tabs ends -->
+    </div>
+  </header>
+  <!-- header ends here -->
+
+  <main>
+    <!-- hamburger -->
+    <div class="hamburger" id="hamburger" data-aos="fade">
+      <div class="hamburgerbase">
+        <button id="hamburger-button" onclick="hamburgerMenu()" tabindex="0" aria-label="Menu Button">
+          <span class="burger-bar" id="burger-bar1"></span>
+          <span class="burger-bar" id="burger-bar2"></span>
+          <span class="burger-bar" id="burger-bar3"></span>
+        </button>
+      </div>
+    </div>
+    <!-- hamburger -->
+    <div class="mobiletogglemenu" id="mobiletogglemenu">
+      <ul class="mobile-navbar-tabs-ul" id="mobile-ul">
+        <li id="home-mobile-tab" class="mobile-navbar-tabs-li home activeThismobiletab" onclick="hidemenubyli()">
+          <a href="#home" tabindex="0" aria-label="Home menu button">
+            &#60;/Home&#62;
+          </a>
+        </li>
+
+        <li id="aboutme-mobile-tab" class="mobile-navbar-tabs-li about" onclick="hidemenubyli()">
+          <a href="#about" tabindex="0" aria-label="about menu button">
+            &#60;/AboutMe&#62;
+          </a>
+        </li>
+        <li id="skills-mobile-tab" class="mobile-navbar-tabs-li skills" onclick="hidemenubyli()">
+          <a href="#skills" tabindex="0" aria-label="skills menu button">
+            &#60;/Skills&#62;
+          </a>
+        </li>
+        <li id="projects-mobile-tab" class="mobile-navbar-tabs-li projects" onclick="hidemenubyli()">
+          <a href="#projects" tabindex="0" aria-label="projects menu button">
+            &#60;/Projects&#62;
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- mobile toggle menu ends -->
+
+    <section class="landing-page-container" id="home">
+      <div class="blob"></div>
+
+      <div class="text-content">
+        <article id="hello-friend" data-aos="fade-up" data-aos-delay="0">
+          <p class="jello">C</p>
+          <p class="jello">o</p>
+          <p class="jello">n</p>
+          <p class="jello">s</p>
+          <p class="jello">t</p>
+          &nbsp;
+          <p class="jello">W</p>
+          <p class="jello">e</p>
+          <p class="jello">b</p>
+          <p class="jello">D</p>
+          <p class="jello">e</p>
+          <p class="jello">s</p>
+          <p class="jello">i</p>
+          <p class="jello">g</p>
+          <p class="jello">n</p>
+          <p class="jello">e</p>
+          <p class="jello">r</p>
+          &nbsp;
+          <p class="jello">=</p>
+          &nbsp;
+          <p class="jello">{}</p>
+          &nbsp;
+          <p class="jello">I</p>
+          <p class="jello">'</p>
+          <p class="jello">m</p>
+        </article>
+        <article id="name" data-aos="fade-up" data-aos-delay="200">
+          <p class="jello">T</p>
+          <p class="jello">Z</p>
+          <p class="jello">U</p>
+          <p class="jello">-</p>
+          <p class="jello">Y</p>
+          <p class="jello">U</p>
+          &nbsp;
+          <p class="jello">C</p>
+          <p class="jello">H</p>
+          <p class="jello">A</p>
+          <p class="jello">O</p>
+  
+          <p class="jello">.</p>
+        </article>
+
+        <article id="work" data-aos="fade-up" data-aos-delay="400">
+          
+          <div id="Prompt Engineer">
+            <p class="jello" style="font-size:5rem;color: rgb(140, 233, 160);">Technical Project Manager</p>
+          </div>
+
+          <div>
+            <p class="jello" style="font-size: 5rem;">&</p>
+          </div>
+          <div>
+            <p class="jello" style="font-size: 5rem;color: rgb(140, 233, 160);">Full Stack / System Designer</p>
+          </div>
+          <!-- <div>
+            <p class="jello" style="font-size: 5rem;">&</p>
+          </div>
+          <div>
+            <p class="jello" style="font-size: 5rem;color: rgb(140, 233, 160);">UI/UX Software Program Designer</p>
+          </div> -->
+
+        </article>
+        <p id="info-para" data-aos="fade-up" data-aos-delay="600">
+          我是一名擁有五年經驗的人工智慧系統設計師，其中包括兩年在研究所專攻人工智慧領域的學習經驗，並利用研究所期間獲得的基礎知識，完成新穎技術的研發與結合。
+          <br/>
+          <br/>
+          我擅長於Prompt指令邏輯設計和複雜系統架構規劃。具備豐富的前端網頁設計及後端系統開發經驗，專注於打造互動性強和使用者友好的WEB UI。我熱衷於利用先進技術優化使用者體驗（UX），並致力於透過研究和融合最新科技，推進技術創新，顯著提升系統效能。我的專業技能和廣泛經驗使我能在數位化轉型和技術革新領域中提供領先解決方案。<br />
+          <!-- <br />
+          I am an artificial intelligence systems designer with five years of experience, which includes two years of specialized study in the AI field during my graduate program. During this time, I utilized the foundational knowledge I gained to develop and integrate cutting-edge technologies. 
+          <br /><br />
+          I excel in Prompt command logic design and complex systems architecture planning. I possess extensive experience in front-end web design and back-end system development, focusing on creating interactive and user-friendly WEB UIs. I am passionate about using advanced technology to optimize user experience (UX) and am committed to advancing technological innovation by researching and integrating the latest technologies, significantly enhancing system performance. My professional skills and broad experience enable me to provide leading solutions in the fields of digital transformation and technological innovation -->
+        </p>
+        <div class="contact-btn-div" data-aos="fade-up" data-aos-delay="800">
+          <a href="mailto:infovinodjangid@gmail.com" tabindex="-1">
+            <button class="letsTalkBtn">
+              <p class="letsTalkBtn-text">My Resume</p>
+              <span class="letsTalkBtn-BG"></span>
+            </button></a>
+          <div class="setting-container" id="setting-container">
+            <input type="checkbox" id="switchforsetting" onclick="settingtoggle()" />
+
+            <label for="switchforsetting" class="needtobeinvert" id="labelforsetting" tabindex="0"
+              aria-label="settings for sound and appearance"></label>
+
+            <div class="visualmodetogglebuttoncontainer" id="visualmodetogglebuttoncontainer">
+              <input type="checkbox" id="switchforvisualmode" onclick="visualmode()" />
+              <label for="switchforvisualmode" id="labelforvisualmode" tabindex="0"
+                aria-label="switch appearance"></label>
+            </div>
+
+            <div class="soundtogglebuttoncontainer" id="soundtogglebuttoncontainer">
+              <input type="checkbox" id="switchforsound" onclick="playpause()" />
+              <label for="switchforsound" id="labelforsound" tabindex="0" aria-label="switch sound"
+                class="needtobeinvert"></label>
+            </div>
+          </div>
+          <!-- setting div ends -->
+        </div>
+        <!-- contact-btn-div -->
+      </div>
+     
+    </section>
+    <!-- landing page ends here -->
+    <section class="about-section-container" id="about" data-aos="fade-up">
+      <div class="about-section">
+        <div class="section-heading">
+          <h2 class="section-heading-article" tabindex="0" aria-label="About me heading">
+            &#60;/AboutMe&#62;
+          </h2>
+          <p class="sectionHeadingP"></p>
+        </div>
+
+        <div class="info-dp-section">
+          <div class="about-info">
+
+            <p tabindex="0">
+              你好！ 我叫侯宏昇。 我是一名 Web 開發人員、Prompt指令工程師、全端/系統架構師和 UI/UX 軟體程式設計師。
+              我不只專注於單一領域，我更喜歡結合自己所擅長的各項領域與研究新穎的智慧技術並將其應用到系統規劃中，因此我其實會稱呼自己為人工智慧系統設計師，這是一個以設計出更方便、更人性化的智慧系統為目標的職業。
+            </p>
+            <br>
+            <!-- <p tabindex="0">
+              Hi! My name is Hong-Sheng HOU. I'm a Web Developer、 Prompt Engineer、Full Stack / System Architect and UI/UX Software Program Designer. I like to study novel intelligent technologies and apply them to system planning, and am committed to designing more humane and convenient intelligent systems.
+            </p>
+            <br>
+            <p tabindex="0">
+              Rather than focusing exclusively on a single field, I prefer to combine my expertise across various areas and explore innovative intelligent technologies to integrate them into system planning. Therefore, I often refer to myself as an Artificial Intelligence Systems Designer, a profession dedicated to creating more convenient, user-friendly, and intelligent systems.
+            </p> -->
+
+
+             <!-- Resume button -->
+      <button class="resume-btn" id="resume-btn" onclick="openURL()">
+        <div class="sign">
+          <svg viewBox="0 0 640 512">
+            <path
+              d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-167l80 80c9.4 9.4 24.6 9.4 33.9 0l80-80c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-39 39V184c0-13.3-10.7-24-24-24s-24 10.7-24 24V318.1l-39-39c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9z" />
+          </svg>
+        </div>
+
+        <div class="text">Resume</div>
+      </button>
+          </div>
+
+          <div class="dp" data-aos="fade-up">
+            <img src="./src/png/personal.jpg"  alt="侯宏昇" tabindex="0" aria-label="image of vinod" />
+            <!-- personal.jpg -->
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- about section ends  -->
+
+    <section class="skills-section-container" id="skills">
+      <div class="skills-section">
+        <div class="section-heading" data-aos="fade-up">
+          <h2 class="section-heading-article" tabindex="0" aria-label="skills heading">
+            &#60;/Skills&#62;
+          </h2>
+          <p class="sectionHeadingP"></p>
+        </div>
+
+        <div class="frontend-dev-section">
+          <h3 class="frontend-dev-heading" data-aos="fade-up" tabindex="0"
+            aria-label="As a frontend a developer these are the skills i have">
+            Tech Stack & Tech Tools
+          </h3>
+          <ul class="tech-stack-wrapper">
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/htmllogo.png" alt="Html skill" class="tech-stack-logo" />
+              <span class="tooltip">HTML</span>
+            </li>
+
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/csslogo.png" alt="css skill" class="tech-stack-logo" />
+              <span class="tooltip">CSS</span>
+            </li>
+
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/jslogo.png" alt="js skill" class="tech-stack-logo" />
+              <span class="tooltip">JS</span>
+            </li>
+
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/bootstraplogo.png" alt="bootstrap skill" class="tech-stack-logo" />
+              <span class="tooltip">BOOTSTRAP</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/Vue.js_Logo_2.svg.png" alt="Vue skill" class="tech-stack-logo" />
+              <span class="tooltip">Vue.JS</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/figmalogo.png" alt="figma skill" class="tech-stack-logo" />
+              <span class="tooltip">FIGMA</span>
+            </li>
+            
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/PHP-logo.svg.png" alt="php skill" class="tech-stack-logo" />
+              <span class="tooltip">PHP</span>
+            </li>
+
+
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/2560px-MySQL.svg.png" alt="MySQL" class="tech-stack-logo" />
+              <span class="tooltip">MySQL</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/Anaconda_Logo.png" alt="Anaconda" class="tech-stack-logo" />
+              <span class="tooltip">Anaconda</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/OpenAI_Logo.svg.png" alt="Open AI" class="tech-stack-logo" />
+              <span class="tooltip">Open AI</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/githublogo.png" alt="github skill" class="tech-stack-logo needtobeinvert" />
+              <span class="tooltip">GITHUB</span>
+            </li>
+
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/gitlogo.png" alt="git skill" class="tech-stack-logo" />
+              <span class="tooltip">GIT</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/Visual_Studio_Code_1.35_icon.png" alt="Visual_Studio_Code" class="tech-stack-logo" />
+              <span class="tooltip">Visual_Studio_Code</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/Xampp_logo.svg.png" alt="Xampp" class="tech-stack-logo" />
+              <span class="tooltip">Xampp</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/Microsoft_Office_PowerPoint_(2019–present).svg.png" alt="PPT" class="tech-stack-logo" />
+              <span class="tooltip">PPT</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/Microsoft_Office_Word_(2019–present).svg.png" alt="Word" class="tech-stack-logo" />
+              <span class="tooltip">Word</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/excel.png" alt="Word" class="tech-stack-logo" />
+              <span class="tooltip">EXCEL</span>
+            </li>
+            <li class="tech-stack-box" data-aos="fade-up">
+              <img src="./src/png/Final_Cut_Pro.png" alt="Word" class="tech-stack-logo" />
+              <span class="tooltip">Final Cut Pro</span>
+            </li>
+
+
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 專案氣泡 -->
+    <section class="projects-section-container" id="projects">
+  <div class="projects-section-div">
+    <div class="section-heading" data-aos="fade-up">
+      <h2 class="section-heading-article" tabindex="0" aria-label="My projects starts from here">
+        &#60;/Projects&#62;
+      </h2>
+      <p class="sectionHeadingP"></p>
+    </div>
+
+    <!-- 氣泡牆應用 -->
+    <div id="app" style="margin-top: 20px;">
+      <h3 class="frontend-dev-heading" data-aos="fade-up" tabindex="0"
+      aria-label="As a frontend a developer these are the skills i have">
+      Project design works
+    </h3>
+      <div class="bubble-container">
+        <div v-for="(bubble, index) in bubbles" 
+             :key="index" 
+             class="memory-bubble"
+             :class="{ playing: bubble.playing }" 
+             @click="openModal(bubble)"
+             data-aos="fade-up">
+          <div class="bubble">
+            <div class="video-container">
+              <img :src="bubble.thumbnailUrl" 
+                   class="video-thumbnail" 
+                   alt="video thumbnail"/>
+              <video :src="bubble.videoUrl"
+                     muted
+                     playsinline
+                     preload="metadata"
+                     ref="bubbleVideos"
+                     @play="bubble.playing = true"
+                     @pause="bubble.playing = false"></video>
+            </div>
+          </div>
+          <span class="tooltip">{{ bubble.title }}</span>
+        </div>
+      </div>
+
+      <!-- 模態視窗 -->
+      <div class="modal-overlay" 
+           :class="{ active: selectedBubble }" 
+           @click="closeModal">
+        <div class="modal-content" @click.stop>
+          <button class="close-button" @click="closeModal">&times;</button>
+          <div class="modal-video-container">
+            <video v-if="selectedBubble"
+                   :src="selectedBubble.videoUrl"
+                   class="modal-video"
+                   controls
+                   autoplay
+                   playsinline
+                   ref="modalVideo"></video>
+          </div>
+          <h2 class="modal-title" v-if="selectedBubble">
+            {{ selectedBubble.title }}
+          </h2>
+        </div>
+      </div>
+
+      <h3 class="frontend-dev-heading" data-aos="fade-up" tabindex="0"
+      aria-label="As a frontend a developer these are the skills i have">
+      Project architecture planning works
+    </h3>
+
+
+    <h3 class="frontend-dev-heading" data-aos="fade-up" tabindex="0"
+    aria-label="As a frontend a developer these are the skills i have">
+    Technical PM project works
+  </h3>
+    </div>
+  </div>
+</section>
+
+    <!-- skills section ends -->
+    <section class="projects-section-container" id="projects">
+      <div class="projects-section-div">
+        <div class="section-heading" data-aos="fade-up">
+          <h2 class="section-heading-article" tabindex="0" aria-label="My projects starts from here">
+            &#60;/Personal Development&#62;
+          </h2>
+          <p class="sectionHeadingP"></p>
+        </div>
+        <div class="project-boxes-div">
+          <div data-aos="fade-up" class="project-box-wrapper">
+            <div class="project-box project-box2" id="project-box2">
+              <div class="info-div">
+              <div style="font-size: 20px;">✨</div>
+                <article class="ProjectHeading">Prompt Artificial Intelligence System based on the LLM model</article>
+                <p class="ProjectDescription">
+                  This is a honeycomb system architecture application based on the superposition of double-layer LLM. Combined with the leave system, the system has a brain to understand the user's leave needs.
+                </p>
+                <div class="project-buttons">
+                  <a href="http://localhost:8888/project_bom/Vue.js/%E6%95%99%E5%AD%B8%E8%B3%87%E6%96%99/Chat/LLM-Prompt-AI-ver02.html" target="_blank" class="cta"
+                    aria-label="Visit Pexelicons Live">
+                    <span>Live view</span>
+                    <svg viewBox="0 0 13 10" height="10px" width="15px">
+                      <path d="M1,5 L11,5"></path>
+                      <polyline points="8 1 12 5 8 9"></polyline>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              <div class="image-div">
+                <!-- <img src="src/webp/Group 76.webp" alt="Pexelicon website preview image" /> -->
+                <img src="src/png/Aries-AI.png" alt="Pexelicon website preview image" />
+
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+  <script src="main.js"></script>
+
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init();
+  </script>
+
+<script>
+  const { createApp } = Vue;
+  
+  createApp({
+    data() {
+      const videoUrls = [
+        "./src/面試Video/src/BOM表系統.mp4",
+        "./src/面試Video/src/虛擬倉庫.mp4",
+        "./src/面試Video/src/出勤管家.mp4",
+        "./src/面試Video/src/加班系統.mp4",
+        "./src/面試Video/src/申請單&請款單列印系統.mp4",
+        "./src/面試Video/src/專案管控系統.mp4",
+        "./src/面試Video/src/盤點系統.mp4",
+        "./src/面試Video/src/請假系統.mp4",
+      ];
+  
+      const thumbnailUrls = [
+        "./src/面試Video/src/虛擬數位倉庫封面.png",
+        "./src/面試Video/src/虛擬數位倉庫封面.png",
+        "./src/面試Video/src/出勤管家第一封面.png",
+        "./src/面試Video/src/加班單封面.png",
+        "./src/面試Video/src/表單列印封面.png",
+        "./src/面試Video/src/虛擬數位倉庫封面.png",
+        "./src/面試Video/src/虛擬數位倉庫封面.png",
+        "./src/面試Video/src/虛擬數位倉庫封面.png",
+      ];
+  
+      const titles = [
+        "BOM表系統",
+        "虛擬倉庫",
+        "出勤管家",
+        "加班系統",
+        "申請單&請款單列印系統",
+        "專案管控系統",
+        "盤點系統",
+        "請假系統"
+      ];
+  
+      return {
+        bubbles: Array.from({ length: 8 }, (_, i) => ({
+          videoUrl: videoUrls[i],
+          thumbnailUrl: thumbnailUrls[i],
+          title: titles[i],
+          playing: false,
+        })),
+        selectedBubble: null,
+      };
+    },
+    methods: {
+      openModal(bubble) {
+        this.selectedBubble = bubble;
+        document.body.classList.add("modal-open");
+        this.$refs.bubbleVideos.forEach((video) => video.pause());
+        window.addEventListener("keydown", this.handleKeyPress);
+      },
+      closeModal() {
+        if (this.$refs.modalVideo) {
+          this.$refs.modalVideo.pause();
+        }
+        document.body.classList.remove("modal-open");
+        this.selectedBubble = null;
+        window.removeEventListener("keydown", this.handleKeyPress);
+      },
+      handleKeyPress(e) {
+        if (e.key === "Escape") {
+          this.closeModal();
+        }
+      },
+    },
+    beforeUnmount() {
+      window.removeEventListener("keydown", this.handleKeyPress);
+    },
+  }).mount("#app");
+  </script>
+
+  <script>
+    function openURL() {
+      var url = "src/pdf/侯宏昇 (1).pdf";
+
+      window.open(url, "_blank");
+    }
+  </script>
+
+
+
+  <script>
+    const cursorInner = document.getElementById("cursor-inner");
+    const cursorOuter = document.getElementById("cursor-outer");
+    const links = document.querySelectorAll("a,label,button");
+
+    document.addEventListener("mousemove", function (e) {
+      const posX = e.clientX;
+      const posY = e.clientY;
+
+      cursorInner.style.left = `${posX}px`;
+      cursorInner.style.top = `${posY}px`;
+
+      // cursorOuter.style.left = `${posX}px`;
+      // cursorOuter.style.top = `${posY}px`;
+
+      cursorOuter.animate(
+        {
+          left: `${posX}px`,
+          top: `${posY}px`,
+        },
+        { duration: 500, fill: "forwards" }
+      );
+
+      links.forEach((link) => {
+        link.addEventListener("mouseenter", () => {
+          cursorInner.classList.add("hover");
+          cursorOuter.classList.add("hover");
+        });
+        link.addEventListener("mouseleave", () => {
+          cursorInner.classList.remove("hover");
+          cursorOuter.classList.remove("hover");
+        });
+      });
+    });
+  </script>
+  
+</body>
+
+</html>
